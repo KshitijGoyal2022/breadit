@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { Icons } from './Icons';
-import UserAuthForm from './UserAuthForm';
+import { Icons } from './icons';
+import UserAuthForm from './user-auth-form';
 
 const SignIn = () => {
   return (

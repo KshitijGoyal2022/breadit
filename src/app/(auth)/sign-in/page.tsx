@@ -1,5 +1,5 @@
-import SignIn from '@/components/SignIn';
-import { buttonVariants } from '@/components/ui/Button';
+import SignIn from '@/components/sign-in';
+import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { FC } from 'react';
