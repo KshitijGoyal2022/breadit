@@ -1,9 +1,97 @@
-import React from 'react'
+'use client';
 
-const SubscribeLeaveToggle = () => {
-  return (
-    <div>SubscribeLeaveToggle</div>
-  )
+import { useMutation } from '@tanstack/react-query';
+import { Button } from './ui/button';
+import { SubscribeToSubredditPayload } from '@/lib/validators/subreddit';
+import axios, { AxiosError } from 'axios';
+import { useCustomToast } from '@/hooks/use-custom-toast';
+import { toast } from '@/hooks/use-toast';
+import { startTransition } from 'react';
+import { useRouter } from 'next/navigation';
+
+interface SubscribeLeaveToggleProps {
+  subredditId: string;
+  isSubscribed: boolean;
+  subredditName: string;
 }
+const SubscribeLeaveToggle = ({ subredditId, isSubscribed, subredditName }: SubscribeLeaveToggleProps) => {
+  const { loginToast } = useCustomToast();
+  const router = useRouter();
 
-export default SubscribeLeaveToggle
+  const {mutate: subscribe, isLoading: isSubLoading} = useMutation({
+    mutationFn: async () => {
+      const payload: SubscribeToSubredditPayload = {
+        subredditId,
+      };
+
+      const { data } = await axios.post('/api/subreddit/subscribe', payload);
+      return data as string;
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          return loginToast();
+        }
+      }
+      return toast({
+        title: 'There was a problem subscribing to this community',
+        description: 'Something went wrong, please try again later',
+        variant: 'destructive',
+      })
+    },
+    onSuccess: ()=>{
+      startTransition(()=>{
+        router.refresh()
+
+      })
+
+      return toast({
+        title: 'Subscribed',
+        description: `You are now subscribed to r${subredditName}`,
+      })
+      
+    }
+  });
+  const {mutate: unsubscribe, isLoading: isUnsubLoading} = useMutation({
+    mutationFn: async () => {
+      const payload: SubscribeToSubredditPayload = {
+        subredditId,
+      };
+
+      const { data } = await axios.post('/api/subreddit/unsubscribe', payload);
+      return data as string;
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          return loginToast();
+        }
+      }
+      return toast({
+        title: 'There was a problem subscribing to this community',
+        description: 'Something went wrong, please try again later',
+        variant: 'destructive',
+      })
+    },
+    onSuccess: ()=>{
+      startTransition(()=>{
+        router.refresh()
+
+      })
+
+      return toast({
+        title: 'Subscribed',
+        description: `You are now unsubscribed from r/${subredditName}`,
+      })
+      
+    }
+  });
+
+  return isSubscribed ? (
+    <Button isLoading={isUnsubLoading} onClick={()=>unsubscribe()} className='w-full mt-1 mb-4'>Leave Community</Button>
+  ) : (
+    <Button isLoading={isSubLoading} onClick={()=>subscribe()}className='w-full mt-1 mb-4'>Join to Post</Button>
+  );
+};
+
+export default SubscribeLeaveToggle;
