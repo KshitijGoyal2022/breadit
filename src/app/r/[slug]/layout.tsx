@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import React from 'react';
 import format from 'date-fns/format';
 import SubscribeLeaveToggle from '@/components/subscribe-leave-toggle';
+import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
 
 const Layout = async ({
   children,
@@ -85,7 +87,23 @@ const Layout = async ({
                   <p className='text-gray-500'>You created this community</p>
                 </div>
               ) : null}
-              {subreddit.creatorId !== session?.user?.id ? (<SubscribeLeaveToggle isSubscribed={isSubscribed} subredditId={subreddit.id} subredditName={subreddit.name}/>):null}
+              {subreddit.creatorId !== session?.user?.id ? (
+                <SubscribeLeaveToggle
+                  isSubscribed={isSubscribed}
+                  subredditId={subreddit.id}
+                  subredditName={subreddit.name}
+                />
+              ) : null}
+
+              <Link
+                href={`r/${slug}/submit`}
+                className={buttonVariants({
+                  variant: 'outline',
+                  className: 'w-full mb-6',
+                })}
+              >
+                Create Post
+              </Link>
             </dl>
           </div>
         </div>
